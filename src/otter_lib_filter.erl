@@ -136,11 +136,7 @@ check({between, Key, Value1, Value2}, Tags) ->
 check({present, Key}, Tags) ->
     lists:keymember(Key, 1, Tags);
 check({one_out_of, Nr}, _Tags) ->
-    %% The rand:uniform/1 call is faster but it needs a process to
-    %% keep state. Calling that from separate processes once will likely
-    %% generate the same number for each call. crypto:rand_uniform/2 is
-    %% convenient from this aspect.
-    case crypto:rand_uniform(0, Nr) of
+     case rand:uniform(Nr) of
         1 -> true;
         _ -> false
     end;

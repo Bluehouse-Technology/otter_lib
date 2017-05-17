@@ -10,16 +10,18 @@
 -type action()  :: atom() | tuple().
 
 -record(span, {
-          timestamp   :: time_us(),           % timestamp of starting the span
-          trace_id    :: trace_id(),          % 64 bit integer trace id
-          name        :: info(),              % name of the span
-          id          :: span_id(),           % 64 bit integer span id
-          parent_id   :: span_id() | undefined, % 64 bit integer parent span id
-          tags = []   :: [{info(), info()} | {info(), info(), service()}],  % span tags
-          logs = []   :: [{time_us(), info()} | {info(), info(), service()}], % span logs
-          duration    :: time_us()            % microseconds between span start/end
+          timestamp       :: time_us(),           % timestamp of starting the span
+          trace_id        :: trace_id(),          % 64 bit integer trace id
+          name            :: info(),              % name of the span
+          id              :: span_id(),           % 64 bit integer span id
+          parent_id       :: span_id() | undefined, % 64 bit integer parent span id
+          tags = []       :: [{info(), info()} | {info(), info(), service()}],  % span tags
+          logs = []       :: [{time_us(), info()} | {info(), info(), service()}], % span logs
+          duration        :: time_us()            % microseconds between span start/end
          }).
 
 -type span()    :: #span{}.
+
+-define(is_span_active(Span), Span#span.timestamp =/= 0).
 
 -endif.
