@@ -44,23 +44,28 @@
         ]).
 
 -include("otter.hrl").
-%%--------------------------------------------------------------------
-%% @doc Starts a span with the specified name. Automatically generates
-%% a trace id.
-%% @end
-%%--------------------------------------------------------------------
+
 -spec start(Name :: info()) -> span().
 start(Name) ->
     start_with_tags(Name, []).
+
+-spec start(Name :: info(), TraceId :: trace_id()) -> span().
 start(Name, TraceId) ->
     start_with_tags(Name, [], TraceId).
+
+-spec start(Name :: info(), TraceId :: trace_id(), ParentId :: span_id()) -> span().
 start(Name, TraceId, ParentId) ->
     start_with_tags(Name, [], TraceId, ParentId).
 
+-spec start_with_tags(Name :: info(), InitialTags :: [tag()]) -> span().
 start_with_tags(Name, InitialTags) ->
     start_with_tags(Name, InitialTags, otter_lib:id()).
+
+-spec start_with_tags(Name :: info(), InitialTags :: [tag()], TraceId :: trace_id()) -> span().
 start_with_tags(Name, InitialTags, TraceId) ->
     start_with_tags(Name, InitialTags, TraceId, undefined).
+
+-spec start_with_tags(Name :: info(), InitialTags :: [tag()], TraceId :: trace_id(), ParentId :: span_id()) -> span().
 start_with_tags(Name, InitialTags, TraceId, ParentId) ->
     #span{
         timestamp = otter_lib:timestamp(),

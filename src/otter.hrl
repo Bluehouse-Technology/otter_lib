@@ -8,6 +8,8 @@
 -type trace_id():: non_neg_integer().
 -type span_id() :: non_neg_integer().
 -type action()  :: atom() | tuple().
+-type tag()     :: {info(), info()} | {info(), info(), service()}.
+-type log()     :: {time_us(), info()} | {time_us(), info(), service()}.
 
 -record(span, {
           timestamp       :: time_us() | undefined,% timestamp of starting the span
@@ -15,8 +17,8 @@
           name            :: info() | undefined,   % name of the span
           id              :: span_id() | undefined,% 64 bit integer span id
           parent_id       :: span_id() | undefined,% 64 bit integer parent span id
-          tags = []       :: [{info(), info()} | {info(), info(), service()}],  % span tags
-          logs = []       :: [{time_us(), info()} | {info(), info(), service()}], % span logs
+          tags = []       :: [tag()],              % span tags
+          logs = []       :: [log()],              % span logs
           duration        :: time_us() | undefined % microseconds between span start/end
          }).
 
