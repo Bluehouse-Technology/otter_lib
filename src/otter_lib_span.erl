@@ -44,7 +44,12 @@
         ]).
 
 -include("otter.hrl").
-
+%%--------------------------------------------------------------------
+%% @doc Starts a span with the specified name. Automatically generates
+%% a trace id.
+%% @end
+%%--------------------------------------------------------------------
+-spec start(Name :: info()) -> span().
 start(Name) ->
     start_with_tags(Name, []).
 start(Name, TraceId) ->
