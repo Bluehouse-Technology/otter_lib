@@ -65,7 +65,7 @@ start_with_tags(Name, InitialTags) ->
 start_with_tags(Name, InitialTags, TraceId) ->
     start_with_tags(Name, InitialTags, TraceId, undefined).
 
--spec start_with_tags(Name :: info(), InitialTags :: [tag()], TraceId :: trace_id(), ParentId :: span_id()) -> span().
+-spec start_with_tags(Name :: info(), InitialTags :: [tag()], TraceId :: trace_id(), ParentId :: span_id() | undefined) -> span().
 start_with_tags(Name, InitialTags, TraceId, ParentId) ->
     #span{
         timestamp = otter_lib:timestamp(),
