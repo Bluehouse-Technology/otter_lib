@@ -136,7 +136,7 @@ check({between, Key, Value1, Value2}, Tags) ->
 check({present, Key}, Tags) ->
     lists:keymember(Key, 1, Tags);
 check({one_out_of, Nr}, _Tags) ->
-     case rand:uniform(Nr) of
+    case crypto:random_uniform(0, Nr) of
         1 -> true;
         _ -> false
     end;
