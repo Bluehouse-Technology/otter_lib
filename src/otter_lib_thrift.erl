@@ -57,7 +57,8 @@ encode_implicit_list(Data) ->
 %% @doc Encodes a {Id, Type, Data} tuple to binary.
 %% @end
 %%--------------------------------------------------------------------
--spec encode({Id :: integer(), Type :: atom(), Data :: term()}) -> binary().
+-spec encode({Id :: integer(), Type :: atom(), Data :: term()}) -> binary();
+            ({Type :: atom(), Data :: term()}) -> binary().
 encode({Id, Type, Data}) ->
     TypeId = map_type(Type),
     EData = encode({Type, Data}),
