@@ -1,9 +1,13 @@
 otter_lib
 =====
 
-An OTP library
+Library modules used by ```otter``` and ```otter_srv```
+
+Check doc folder for further information.
+
 
 Build
 -----
 
     $ rebar3 compile
+

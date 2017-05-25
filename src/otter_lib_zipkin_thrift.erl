@@ -30,11 +30,26 @@
 
 -include("otter.hrl").
 
+%%--------------------------------------------------------------------
+%% @doc Encodes a list of spans to a thrift (binary encoded) binary.
+%% ExtraTags is a list of key-value pairs that are added for each span in
+%% the list (e.g. the "lc" tag which tags the span with service information)
+%% in OpenZipkin. ServiceDefaults is used to complete the service information
+%% when only partial information is provided in span information e.g. default
+%% or only service name.
+%% @end
+%%--------------------------------------------------------------------
+-spec encode_spans(Spans :: [span()], ExtraTags :: list(), ServiceDefaults :: term()) -> binary().
 encode_spans(Spans, ExtraTags, ServiceDefaults) ->
     otter_lib_thrift:encode_implicit_list(
         {struct, [span_to_struct(S, ExtraTags, ServiceDefaults) || S <- Spans]}
     ).
 
+%%--------------------------------------------------------------------
+%% @doc Decodes a binary to a list of spans.
+%% @end
+%%--------------------------------------------------------------------
+-spec decode_spans(BinaryData :: binary()) -> [span()].
 decode_spans(Data) ->
     {
         {struct, StructList},

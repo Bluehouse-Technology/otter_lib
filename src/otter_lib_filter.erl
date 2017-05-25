@@ -18,54 +18,100 @@
 %%%
 %%%
 %%% @doc
-%%% The main idea behind this filter that the processing of the spans can
-%%% be modified runtime by changing the filter configuration. This way
-%%% logging, counting or sending data to trace collectors can be modified
-%%% on the running system based on the changing operational requirements.
-%%%
-%%% The span filter works with key value pair lists. This was the
-%%% easiest to implement and reasonably fast.
+%%% Run a list of key-value pairs through a list of conditions and return
+%%% the specified actions for the matching ones.
 %%%
 %%% Filter rules are composed by a list of `{Conditions, Actions}' tuples.
 %%% Processing a span means iterating through this list and when an item
 %%% found where all `Conditions' evaluate to true then the `Actions' in that
-%%% item are executed.
+%%% item are collected and at the end of the evaluation returned to the
+%%% caller for execution. i.e. the filter library can be applied in different
+%%% environments.
 %%%
-%%% `Conditions' operate on a copy of the tags of the span. It is a
-%%% sequence of checks against the tags (e.g. key present, key value)
-%%% where if any check in the sequence fails, the associated actions are
-%%% not executed and the next `{Conditions, Actions}' item is evaluated.
+%%% The evaluation of the rules can run in 2 modes. The `break' mode means
+%%% that it stops at the first matching item and returns the `Actions'
+%%% specified there. The `continue' mode runs through all `{Conditions, Actions}'
+%%% items and collects all matching `Actions'.
 %%%
-%%% `Evaluation' of the rules happens in the process which invokes the span
-%%% end statement (e.g. @link otter:finish/1.) i.e. it has impact on the
-%%% request processing time. Therefore the actions that consume little
-%%% time and resources with no external interfaces (e.g. counting in ets)
-%%% can be done during the evaluation of the rules, but anything that has
-%%% external interface or dependent on environment (e.g. logging and trace
-%%% collecting) should be done asynchronously.
+%%% The library implements the following conditions :
+%%%
+%%% Check the presence of a Key
+%%%
+%%% `{present, Key}'
+%%%
+%%%%
+%%% Check whether 2 Keys have the same value
+%%%
+%%% `{same, Key1, Key2}'
+%%%
+%%%
+%%% The value of a Key/Value pair can be compared to a value
+%%%
+%%% `{value, Key, ValueToCompare}'
+%%%
+%%% example: check the name of the span
+%%%
+%%% `{value, otter_span_name, "radius request"}'
+%%%
+%%%
+%%% Checking integer values
+%%% Key/Value pairs with integer values can be checked with the following
+%%% conditions.
+%%%
+%%% `{greater, Key, Integer}'
+%%% `{less, Key, Integer}'
+%%% `{between, Key, Integer1, Integer2}'
+%%%
+%%% example: check whether the span duration is greater than 5 seconds
+%%%
+%%% `{greater, otter_span_duration, 5000000}'
+%%%
+%%%
+%%% Negate condition check
+%%%
+%%% `{negate, Condition}'
+%%%
+%%% example: Check if the value of the "final_result" tag is other than "ok"
+%%%
+%%% `{negate, {value, "final_result", "ok"}}'
+%%%
+%%% One out of
+%%%
+%%% This condition uses a random generated number and in the range of `0 < X =< Integer',
+%%% and if the generated value is 1 it returns true.
+%%%
+%%% `{one_out_of, Integer}'
+%%%
+%%% example: Match 1 out of 1000 requests
+%%% `{one_out_of, 1000}'
 %%% @end
 %%%-------------------------------------------------------------------
 
 -module(otter_lib_filter).
 -export([run/2, run/3]).
 
-%%--------------------------------------------------------------------
-%% @doc Takes a span and rules as input. The conditions of the rules are
-%% evaluated and all matching actions are collected in a list which is
-%% returned to the caller for execution.
-%% @end
-%% --------------------------------------------------------------------
 
 -type condition() :: tuple().
 -type action()    :: tuple()|atom().
 -type rules()     :: [{[condition()], [action()]}].
 -type tags()      :: [{term(), term()}].
 
--spec run(tags(), rules()) -> [action()].
+%%---------------------------------------------------------------------
+%% @doc Run the key-value pair data (tags) through the rules with the default
+%% `continue' mode.
+%% @end
+%%---------------------------------------------------------------------
+-spec run(Tags :: tags(), Rules :: rules()) -> [action()].
 run(Tags, Rules) ->
     run(Tags, Rules, continue).
 
--spec run(tags(), rules(), break|continue) -> [action()].
+
+%%---------------------------------------------------------------------
+%% @doc Run the key-value pair data (tags) through the rules with the specified
+%% mode.
+%% @end
+%%---------------------------------------------------------------------
+-spec run(Tags :: tags(), Rules :: rules(), Mode :: break|continue) -> [action()].
 run(Tags, Rules, BreakOrContinue) ->
     rules(Rules, Tags, BreakOrContinue, []).
 

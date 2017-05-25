@@ -1,0 +1,4 @@
+%% encoding: UTF-8
+{application,otter_lib}.
+{modules,[otter_lib,otter_lib_filter,otter_lib_snapshot_count,otter_lib_span,
+          otter_lib_thrift,otter_lib_zipkin_thrift]}.

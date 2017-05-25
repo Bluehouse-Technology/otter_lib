@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module otter_lib_filter</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module otter_lib_filter</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>   
+Run a list of key-value pairs through a list of conditions and return   
+the specified actions for the matching ones.
+
+
+<h2><a name="description">Description</a></h2><p>   
+Run a list of key-value pairs through a list of conditions and return   
+the specified actions for the matching ones.</p>
+  
+   <p>Filter rules are composed by a list of <code>{Conditions, Actions}</code> tuples.
+   Processing a span means iterating through this list and when an item
+   found where all <code>Conditions</code> evaluate to true then the <code>Actions</code> in that   
+item are collected and at the end of the evaluation returned to the   
+caller for execution. i.e. the filter library can be applied in different   
+environments.</p>
+  
+   <p>The evaluation of the rules can run in 2 modes. The <code>break</code> mode means
+   that it stops at the first matching item and returns the <code>Actions</code>
+   specified there. The <code>continue</code> mode runs through all <code>{Conditions, Actions}</code>
+   items and collects all matching <code>Actions</code>.</p>
+  
+   <p>The library implements the following conditions :</p>
+  
+   <p>Check the presence of a Key</p>
+  
+   <p><code>{present, Key}</code></p>
+  
+   
+   <p>Check whether 2 Keys have the same value</p>
+  
+   <p><code>{same, Key1, Key2}</code></p>
+  
+  
+   <p>The value of a Key/Value pair can be compared to a value</p>
+  
+   <p><code>{value, Key, ValueToCompare}</code></p>
+  
+   <p>example: check the name of the span</p>
+  
+   <p><code>{value, otter_span_name, "radius request"}</code></p>
+  
+  
+   <p>Checking integer values   
+Key/Value pairs with integer values can be checked with the following   
+conditions.</p>
+  
+   <p><code>{greater, Key, Integer}</code>
+   <code>{less, Key, Integer}</code>
+   <code>{between, Key, Integer1, Integer2}</code></p>
+  
+   <p>example: check whether the span duration is greater than 5 seconds</p>
+  
+   <p><code>{greater, otter_span_duration, 5000000}</code></p>
+  
+  
+   <p>Negate condition check</p>
+  
+   <p><code>{negate, Condition}</code></p>
+  
+   <p>example: Check if the value of the "final_result" tag is other than "ok"</p>
+  
+   <p><code>{negate, {value, "final_result", "ok"}}</code></p>
+  
+   <p>One out of</p>
+  
+   <p>This condition uses a random generated number and in the range of <code>0 &lt; X =&lt; Integer</code>,   
+and if the generated value is 1 it returns true.</p>
+  
+   <p><code>{one_out_of, Integer}</code></p>
+  
+   example: Match 1 out of 1000 requests
+   <code>{one_out_of, 1000}</code>
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-action">action()</a></h3>
+<p><tt>action() = tuple() | atom()</tt></p>
+
+
+<h3 class="typedecl"><a name="type-condition">condition()</a></h3>
+<p><tt>condition() = tuple()</tt></p>
+
+
+<h3 class="typedecl"><a name="type-rules">rules()</a></h3>
+<p><tt>rules() = [{[<a href="#type-condition">condition()</a>], [<a href="#type-action">action()</a>]}]</tt></p>
+
+
+<h3 class="typedecl"><a name="type-tags">tags()</a></h3>
+<p><tt>tags() = [{term(), term()}]</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#run-2">run/2</a></td><td>Run the key-value pair data (tags) through the rules with the default
+  <code>continue</code> mode.</td></tr>
+<tr><td valign="top"><a href="#run-3">run/3</a></td><td>Run the key-value pair data (tags) through the rules with the specified
+  mode.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="run-2">run/2</a></h3>
+<div class="spec">
+<p><tt>run(Tags::<a href="#type-tags">tags()</a>, Rules::<a href="#type-rules">rules()</a>) -&gt; [<a href="#type-action">action()</a>]</tt><br></p>
+</div><p>Run the key-value pair data (tags) through the rules with the default
+  <code>continue</code> mode.</p>
+
+<h3 class="function"><a name="run-3">run/3</a></h3>
+<div class="spec">
+<p><tt>run(Tags::<a href="#type-tags">tags()</a>, Rules::<a href="#type-rules">rules()</a>, Mode::break | continue) -&gt; [<a href="#type-action">action()</a>]</tt><br></p>
+</div><p>Run the key-value pair data (tags) through the rules with the specified
+  mode.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, May 26 2017, 00:23:00.</i></p>
+</body>
+</html>

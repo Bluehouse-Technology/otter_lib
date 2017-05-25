@@ -1,5 +1,5 @@
 {application, otter_lib,
- [{description, "An OTP library"},
+ [{description, "Library with otter common functions"},
   {vsn, "0.1.0"},
   {registered, []},
   {applications,
@@ -8,8 +8,7 @@
    ]},
   {env,[]},
   {modules, []},
-
-  {maintainers, []},
-  {licenses, []},
-  {links, []}
+  {maintainers, ["Ferenc Holzhauser", "Chandrashekhar Mullaparthi"]},
+  {licenses, ["Apache"]},
+  {links, [{"Github", "https://github.com/bluehouse-technology/otter_lib"}]}
  ]}.

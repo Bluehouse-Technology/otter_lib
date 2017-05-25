@@ -32,13 +32,32 @@
 %% encode/decode basic thrift binary data
 %% e.g. The transport (e.g. HTTP) data is an "implicit" list starting
 %% with the element type, and number of elements ..
+
+%%--------------------------------------------------------------------
+%% @doc Decodes a binary input as implicit list to a thrift decoded data
+%% structure, i.e. list of {Id, Type, Value} tuples. Implicit list is e.g.
+%% how OpenZipkin expects the spans to be send. It is called implicit as it
+%% does not contain a list type tag in the beginning.
+%% @end
+%%--------------------------------------------------------------------
+-spec decode_implicit_list(BinaryData :: binary()) -> term().
 decode_implicit_list(BinaryData) ->
     decode(list, BinaryData).
 
+%%--------------------------------------------------------------------
+%% @doc Encodes a list of thrift data structures to binary e.g. to be sent
+%% on the wire.
+%% @end
+%%--------------------------------------------------------------------
+-spec encode_implicit_list(term()) -> binary().
 encode_implicit_list(Data) ->
     encode({list, Data}).
 
-%% Encoding functions
+%%--------------------------------------------------------------------
+%% @doc Encodes a {Id, Type, Data} tuple to binary.
+%% @end
+%%--------------------------------------------------------------------
+-spec encode({Id :: integer(), Type :: atom(), Data :: term()}) -> binary().
 encode({Id, Type, Data}) ->
     TypeId = map_type(Type),
     EData = encode({Type, Data}),
@@ -96,6 +115,12 @@ encode({map, {KeyType, ValType, Data}}) ->
     <<KeyTypeId, ValTypeId, Size:32, EData/bytes>>.
 
 %% Decoding functions
+
+%%--------------------------------------------------------------------
+%% @doc Decodes a binary to {{Id, Type, Data}, Rest} tuple and rest of data.
+%% @end
+%%--------------------------------------------------------------------
+-spec decode( BinaryData :: binary()) -> {{Id :: integer(), Type :: atom(), Data :: term()}, Rest :: binary()}.
 decode(<<TypeId, Id:16, Data/bytes>>) ->
     Type = map_type(TypeId),
     {Val, Rest} = decode(Type, Data),
