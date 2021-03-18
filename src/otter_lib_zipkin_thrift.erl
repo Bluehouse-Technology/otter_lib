@@ -67,8 +67,10 @@ span_to_struct(#span{
     timestamp = Timestamp,
     duration = Duration
 }, ExtraTags, ServiceDefaults) ->
+    TraceIdHigh = TraceId bsr 64,
+    TraceIdLow = TraceId rem (1 bsl 64),
     [
-        {1, i64, TraceId},
+        {1, i64, TraceIdLow},
         {3, string, otter_lib:to_bin(Name)},
         {4, i64, Id}
     ] ++
@@ -89,7 +91,13 @@ span_to_struct(#span{
         }},
         {10, i64, Timestamp},
         {11, i64, Duration}
-    ].
+    ] ++
+    case TraceIdHigh of
+        0 ->
+            [];
+        TraceIdHigh ->
+            [{12, i64, TraceIdHigh}]
+    end.
 
 log_to_annotation({Timestamp, Text}, _ServiceDefaults) ->
     [
